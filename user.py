@@ -9,11 +9,25 @@ client = MongoClient(security.password)
 db = client.objects
 users = db["users"]
 
-class User:
-    def __init__(self, username, password):
-        pass
+class UserMethods:
+    def insert(postedData):
+        username, password = postedData["username"], postedData["password"]
 
-    def authenticate(username, password):
+        if (len(password) <= 5):
+            return {"message":"password too short", "status code":401}
+
+        if users.count_documents({'username': username}, limit = 1) != 0 :
+            return {"message":"username already exists", "status code":403}
+
+        #Hash password and append user
+        hashedPassword = hashpw(password.encode('utf8'), gensalt())
+        users.insert({"username":username, "password":hashedPassword})
+
+        return {"message":"user signed succesfuly", "status code":201}
+
+    def authenticate(postedData):
+        username, password = postedData["username"], postedData["password"]
+
         if users.count_documents({'username': username}, limit = 1) == 0 :
             return False
         else:
@@ -23,28 +37,12 @@ class User:
             else:
                 return False
 
-
 class RegisterUser(Resource):
     def post(self):
         #Get data
         postedData = request.get_json()
-        username, password = postedData["username"], postedData["password"]
+        
+        #Validating user and appending if valid
+        insertuser = UserMethods.insert(postedData)
 
-        #Check if password long enough
-        if (len(password) <= 5):
-            return {"message":"password too short", "status code":401}
-
-        #Check if user already exists
-        if users.count_documents({'username': username}, limit = 1) != 0 :
-            return {"message":"username already exists", "status code":403}
-
-        #Hash password
-        hashedPassword = hashpw(password.encode('utf8'), gensalt())
-
-        #Append user
-        users.insert({
-            "username":username,
-            "password":hashedPassword,
-            })
-
-        return {"message":"user signed succesfuly", "status code":201}
+        return insertuser
