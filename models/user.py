@@ -26,10 +26,10 @@ class UserModel:
         username, password = posted_data["username"], posted_data["password"]
 
         if users.count_documents({'username': username}, limit = 1) == 0 :
-            return False
+            return {"message":"wrong username or password", "status code":401}
         else:
             hashedPassword = users.find_one({"username":username})["password"]
             if hashpw(password.encode('utf8'), hashedPassword) == hashedPassword:
-                return True
+                return {"message":"logged in succesfuly", "status code":200}
             else:
-                return False
+                return {"message":"wrong username or password", "status code":401}

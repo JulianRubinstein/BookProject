@@ -16,6 +16,6 @@ class Book(Resource):
 
 class SearchBook(Resource):
     def get(self):
-        posteData = request.get_json()
+        posted_data = request.get_json()
         searchbook = BookModel.searchbook(posted_data)
         return searchbook

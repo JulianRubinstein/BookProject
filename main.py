@@ -11,6 +11,7 @@ api = Api(app)
 api.add_resource(user.RegisterUser, "/registeruser")
 api.add_resource(book.Book, "/book")
 api.add_resource(book.SearchBook, "/search")
+api.add_resource(booklist.BookList, "/booklist")
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

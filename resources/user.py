@@ -7,7 +7,7 @@ class RegisterUser(Resource):
     def post(self):
         posted_data = request.get_json()
         insert_user = UserModel.insert(posted_data)
-        return inser_tuser
+        return insert_user
 
 class LogIn(Resource):
     def post(self):
