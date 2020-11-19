@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_restful import Api
 
-import user
-import book
-import booklist
+import resources.user as user
+import resources.book as book
+import resources.booklist as booklist
 
 app = Flask(__name__)
 api = Api(app)
