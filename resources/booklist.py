@@ -1,7 +1,13 @@
 from flask import request
 from flask_restful import Resource
+from pymongo import MongoClient
 
 from models.booklist import BookListModel
+import security
+
+client = MongoClient(security.password)
+db = client.objects
+books = db["books"]
 
 class BookList(Resource):
     def post(self):

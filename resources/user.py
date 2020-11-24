@@ -1,7 +1,14 @@
 from flask import request
 from flask_restful import Resource
+from pymongo import MongoClient
+from bcrypt import hashpw, gensalt
 
 from models.user import UserModel
+import security
+
+client = MongoClient(security.password)
+db = client.objects
+users = db["users"]
 
 class RegisterUser(Resource):
     def post(self):
@@ -9,8 +16,8 @@ class RegisterUser(Resource):
 
         username, password = posted_data["username"], posted_data["password"]
 
-        if registrate() is not None:
-            return registrate()
+        if UserModel.registrate(username, password) is not None:
+            return UserModel.registrate(username, password)
 
         hashedPassword = hashpw(password.encode('utf8'), gensalt())
         users.insert({"username":username, "password":hashedPassword})

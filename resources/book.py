@@ -4,14 +4,21 @@ from pymongo import MongoClient
 import requests
 import json
 
+import security
 from models.book import BookModel
+
+client = MongoClient(security.password)
+db = client.objects
+books = db["books"]
 
 class Book(Resource):
     def get(self):
         posted_data = request.get_json()
 
-        if BookModel.book_exist() is None:
+        if BookModel.book_exist(posted_data) is None:
             return {"message":"no such book", "status code":200}
+
+        return_data = books.find_one({ "$and" : [ {'name':posted_data["name"]} , {'author':posted_data["author"]} ] }, {"_id":0} )
 
         return {"book":return_data, "message":"succesful", "status code":200}
 
@@ -19,12 +26,12 @@ class Book(Resource):
         posted_data = request.get_json()
 
         #Checking book is valid (only book name and book author can uniquely identify a book)
-        if BookModel.validate_book() is not None:
-            return BookModel.validate_book()
+        if BookModel.validate_book(posted_data) is not None:
+            return BookModel.validate_book(posted_data)
 
         #Checking if book already exists
-        if BookModel.book_exist() is not None:
-            return BookModel.book_exist()
+        if BookModel.book_exist(posted_data) is not None:
+            return BookModel.book_exist(posted_data)
 
         books.insert(posted_data)
 
@@ -55,12 +62,12 @@ class Search_Google_Books(Resource):
 
         book_item_to_dict = lambda book : {"Title" : book["volumeInfo"]['title'], "Authors" : book["volumeInfo"]['authors'], "Description" : book["volumeInfo"].get('description', None), "Rating": book["volumeInfo"].get("averageRating", None)}
 
-        request = json.loads(requests.get(url).text)
-        book_items = request["items"]
+        req = json.loads(requests.get(url).text)
+        book_items = req["items"]
 
         book_list = [book_item_to_dict(book) for book in book_items]
 
-        if (len(book_list) = 0):
+        if (len(book_list) == 0):
             return {"message":"no books found", "status code":404}
 
         return {"books":book_list, "message":"succesful", "status code":200}
