@@ -14,7 +14,7 @@ class SearchBooks(Resource):
 
         url=f"https://www.googleapis.com/books/v1/volumes?q={search_query}&key={security.api_key}"
 
-        book_item_to_dict = lambda book : {"Title" : book["volumeInfo"]['title'], "Authors" : book["volumeInfo"]['authors'], "Description" : book["volumeInfo"].get('description', None), "Rating": book["volumeInfo"].get("averageRating", None)}
+        book_item_to_dict = lambda book : {"Title" : book["volumeInfo"]['title'], "Authors" : book["volumeInfo"].get('authors', None), "Description" : book["volumeInfo"].get('description', None), "Rating": book["volumeInfo"].get("averageRating", None)}
 
         req = json.loads(requests.get(url).text)
         book_items = req["items"]
