@@ -1,19 +1,18 @@
-from pymongo import MongoClient
-
-import security
-
-client = MongoClient(security.password)
-db = client.objects
-
-book_lists = db["book lists"]
-books = db["books"]
+from database.mongodb import book_lists
 
 class BookListModel:
-    def create_list(posted_data):
-        pass
+    def validate_list(posted_data):
+        if 'name' not in posted_data or (len(posted_data["name"]) == 0):
+            return {"message": "list must contain name", "status code":422}
 
-    def get_list(posted_data):
-        pass
+        if book_lists.count_documents({'name':posted_data["name"]}, limit = 1) != 0 :
+                return {"message":"booklist already exists", "status code":403}
 
-    def add_book_to_list(book, list):
-        pass
+    def create_dict(posted_data):
+        booklist={
+            "name" : posted_data["name"],
+            "booklist" : posted_data.get("books", []),
+            "description" : posted_data.get("description", None),
+            "playlist_author" : posted_data.get("plalist_author", None)
+            }
+        return booklist

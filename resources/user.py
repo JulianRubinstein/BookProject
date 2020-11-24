@@ -1,14 +1,10 @@
 from flask import request
 from flask_restful import Resource
-from pymongo import MongoClient
 from bcrypt import hashpw, gensalt
 
+from database.mongodb import users
 from models.user import UserModel
 import security
-
-client = MongoClient(security.password)
-db = client.objects
-users = db["users"]
 
 class RegisterUser(Resource):
     def post(self):
