@@ -1,14 +1,13 @@
 from bcrypt import hashpw, gensalt
 
 from database.mongodb import users
+import security
 
 class UserModel:
     def registrate(posted_data):
-        if 'username' not in posted_data or 'password' not in posted_data or 'email' not in posted_data:
-            return {"message": "please enter username, password and email", "status code":422}
-
-        username, password = posted_data["username"], posted_data["password"]
-        email = posted_data.get("email", None)
+        username = posted_data.get("username", "")
+        password = posted_data.get("password", "")
+        email = posted_data.get("email", "")
 
         if (len(password) <= 5):
             return {"message":"password too short", "status code":401}
@@ -25,9 +24,7 @@ class UserModel:
         if users.count_documents({'email': email}, limit = 1) != 0 :
             return {"message":"email already exists", "status code":403}
 
-    def authenticate(posted_data):
-        username, password = posted_data["username"], posted_data["password"]
-
+    def authenticate(username, password):
         if users.count_documents({'username': username}, limit = 1) == 0 :
             return {"message":"wrong username or password", "status code":401}
 
@@ -35,3 +32,9 @@ class UserModel:
 
         if hashpw(password.encode('utf8'), hashed_password) != hashed_password:
                 return {"message":"wrong username or password", "status code":401}
+
+        return users.find_one({"username":username}, {"_id":0})
+
+    def identity(payload):
+        username = payload['username']
+        return users.find_one({"username":username})

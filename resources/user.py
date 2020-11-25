@@ -1,9 +1,11 @@
 from flask import request
 from flask_restful import Resource
-from bcrypt import hashpw, gensalt
+from flask_jwt import JWT
+import datetime
 
-from database.mongodb import users
 from models.user import UserModel
+from database.mongodb import users
+import security
 
 class RegisterUser(Resource):
     def post(self):
@@ -25,5 +27,3 @@ class LogIn(Resource):
 
         if UserModel.authenticate(posted_data) is not None:
             return UserModel.authenticate(posted_data)
-
-        return {"message":"succesfuly logged in", "status code":200}

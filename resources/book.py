@@ -1,12 +1,14 @@
 from flask import request
 from flask_restful import Resource
+from flask_jwt import jwt_required
 import requests
 import json
 
-import security
 from models.book import BookModel
+import security
 
 class SearchBooks(Resource):
+    @jwt_required
     def get(self):
         posted_data = request.get_json()
 
