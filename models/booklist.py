@@ -13,6 +13,6 @@ class BookListModel:
             "name" : posted_data["name"],
             "booklist" : posted_data.get("books", []),
             "description" : posted_data.get("description", None),
-            "playlist_author" : posted_data.get("plalist_author", None)
+            "playlist_author" : posted_data.get("playlist_author", None)
             }
         return booklist

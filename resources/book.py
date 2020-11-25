@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 import requests
 import json
 
@@ -26,4 +26,4 @@ class SearchBooks(Resource):
         if (len(book_list) == 0):
             return {"message":"no books found", "status code":404}
 
-        return {"books":book_list, "message":"succesful", "status code":200}
+        return {"books":book_list, "user":get_jwt_identity(), "message":"succesful", "status code":200}

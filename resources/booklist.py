@@ -1,11 +1,13 @@
 from flask import request
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from database.mongodb import book_lists
 from models.booklist import BookListModel
 from models.book import BookModel
 
 class BookList(Resource):
+    @jwt_required
     def post(self):
         posted_data = request.get_json()
 
@@ -16,8 +18,9 @@ class BookList(Resource):
 
         book_lists.insert(booklist)
 
-        return {"message":"book list added succesfuly", "status code": 200}
+        return {"message":"book list added succesfuly", "user":get_jwt_identity() ,"status code": 200}
 
+    @jwt_required
     def get(self):
         posted_data = request.get_json()
 
@@ -26,9 +29,10 @@ class BookList(Resource):
         if booklist == None:
                 return {"message":"book list not found", "status code": 404}
 
-        return {"book list":booklist, "message":"succesful", "status code": 200}
+        return {"book list":booklist, "user":get_jwt_identity(), "message":"succesful", "status code": 200}
 
 class AddToList(Resource):
+    @jwt_required
     def post(self):
         posted_data = request.get_json()
 
@@ -39,9 +43,10 @@ class AddToList(Resource):
 
         book_lists.update({"name": posted_data["booklist name"]},{"$push": {'booklist': posted_data["book"]}})
 
-        return {"message":"book added succesfuly", "status code": 200}
+        return {"message":"book added succesfuly", "user":get_jwt_identity(), "status code": 200}
 
 class SearchList(Resource):
+    @jwt_required
     def get(self):
         posted_data = request.get_json()
 
@@ -50,4 +55,4 @@ class SearchList(Resource):
         if len(return_data) == 0:
             return {"message":"no booklists found", "status code":404}
 
-        return {"book lists": return_data,"message":"succesful", "status code":200}
+        return {"book lists": return_data, "user":get_jwt_identity(), "message":"succesful", "status code":200}

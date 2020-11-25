@@ -24,7 +24,9 @@ class UserModel:
         if users.count_documents({'email': email}, limit = 1) != 0 :
             return {"message":"email already exists", "status code":403}
 
-    def authenticate(username, password):
+    def authenticate(posted_data):
+        username, password = posted_data["username"], posted_data["password"]
+
         if users.count_documents({'username': username}, limit = 1) == 0 :
             return {"message":"wrong username or password", "status code":401}
 
@@ -32,9 +34,3 @@ class UserModel:
 
         if hashpw(password.encode('utf8'), hashed_password) != hashed_password:
                 return {"message":"wrong username or password", "status code":401}
-
-        return users.find_one({"username":username}, {"_id":0})
-
-    def identity(payload):
-        username = payload['username']
-        return users.find_one({"username":username})
