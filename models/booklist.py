@@ -1,18 +1,24 @@
 from database.mongodb import book_lists
 
 class BookListModel:
-    def validate_list(posted_data):
-        if 'name' not in posted_data or (len(posted_data["name"]) == 0):
-            return {"message": "list must contain name", "status code":422}
+    def __init__(self, name, playlist_author, books = [], description = "", **kwargs):
+        self.name = name
+        self.playlist_author = playlist_author
+        self.books = books
+        self.description = description
 
-        if book_lists.count_documents({'name':posted_data["name"]}, limit = 1) != 0 :
-                return {"message":"booklist already exists", "status code":403}
-
-    def create_dict(posted_data):
+    def to_dict(self):
         booklist={
-            "name" : posted_data["name"],
-            "booklist" : posted_data.get("books", []),
-            "description" : posted_data.get("description", None),
-            "playlist_author" : posted_data.get("playlist_author", None)
+            "name" : self.name,
+            "playlist_author" : self.playlist_author,
+            "booklist" : self.books,
+            "description" : self.description
             }
         return booklist
+
+    def validate_list(name, **kwargs):
+        if len(name) == 0:
+            return {"message": "list must contain name", "status code":422}
+
+        if book_lists.count_documents({'name':name}, limit = 1) != 0 :
+                return {"message":"booklist already exists", "status code":403}

@@ -10,13 +10,17 @@ class BookList(Resource):
     @jwt_required
     def post(self):
         posted_data = request.get_json()
+        posted_data["playlist_author"] = get_jwt_identity()["username"]
 
-        if BookListModel.validate_list(posted_data) is not None:
-            return BookListModel.validate_list(posted_data)
+        if get_jwt_identity()["access level"] <= 1:
+            return {"message":"only admins", "user":get_jwt_identity() ,"status code": 401}
 
-        booklist = BookListModel.create_dict(posted_data)
+        if BookListModel.validate_list(**posted_data):
+            return BookListModel.validate_list(**posted_data)
 
-        book_lists.insert(booklist)
+        booklist_instance = BookListModel(**posted_data)
+
+        book_lists.insert(booklist_instance.to_dict())
 
         return {"message":"book list added succesfuly", "user":get_jwt_identity() ,"status code": 200}
 
@@ -36,7 +40,11 @@ class AddToList(Resource):
     def post(self):
         posted_data = request.get_json()
 
-        BookModel.validate_book(posted_data["book"])
+        if get_jwt_identity()["access level"] <= 1:
+            return {"message":"only admins", "user":get_jwt_identity() ,"status code": 401}
+
+        if BookModel.validate_book(**posted_data["book"]):
+            return BookModel.validate_book(**posted_data["book"])
 
         if book_lists.count_documents({'name':posted_data["booklist name"]}, limit = 1) == 0 :
                 return {"message":"booklist doesn't exist", "status code":404}

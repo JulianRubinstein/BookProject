@@ -4,11 +4,25 @@ from database.mongodb import users
 import security
 
 class UserModel:
-    def registrate(posted_data):
-        username = posted_data.get("username", "")
-        password = posted_data.get("password", "")
-        email = posted_data.get("email", "")
+    def __init__(self, username, password, email, **kwargs):
+        self.username = username
+        self.password = password
+        self.email = email
+        self.access = 1
 
+    def to_admin(self):
+        self.access = 2
+
+    def to_dict(self):
+        dict = {
+        "username":self.username,
+        "password":self.password,
+        "email":self.email,
+        "access":self.access
+        }
+        return dict
+
+    def registrate(username, password, email, **kwargs):
         if (len(password) <= 5):
             return {"message":"password too short", "status code":401}
 
@@ -24,9 +38,7 @@ class UserModel:
         if users.count_documents({'email': email}, limit = 1) != 0 :
             return {"message":"email already exists", "status code":403}
 
-    def authenticate(posted_data):
-        username, password = posted_data["username"], posted_data["password"]
-
+    def authenticate(username, password, **kwargs):
         if users.count_documents({'username': username}, limit = 1) == 0 :
             return {"message":"wrong username or password", "status code":401}
 
