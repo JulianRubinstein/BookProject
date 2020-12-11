@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  resources:
+    build: './resources'
+    links:
+      -models
+      -database
+      -main
+
+  models:
+    build: './models'
+    links:
+      -database
+      -main
+
+  database:
+    build: "./database"
+    links:
+      -main
+      
+  main:
+    build: .
+    ports: 5000:5000
+    links:
+      -resources
