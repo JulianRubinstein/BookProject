@@ -4,23 +4,20 @@ services:
   resources:
     build: './resources'
     links:
-      -models
-      -database
-      -main
+      - "models"
+      - "database"
 
   models:
     build: './models'
     links:
-      -database
-      -main
+      - "database"
 
   database:
     build: "./database"
-    links:
-      -main
-      
+
   main:
     build: .
-    ports: 5000:5000
+    ports:
+      - "5000:5000"
     links:
-      -resources
+      - "resources"
